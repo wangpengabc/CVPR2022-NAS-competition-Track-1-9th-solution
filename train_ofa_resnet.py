@@ -100,7 +100,7 @@ args.manual_seed = 0
 
 args.lr_schedule_type = 'cosine'
 
-args.base_batch_size = 64
+args.base_batch_size = 224
 args.valid_size = None
 
 args.opt_type = 'sgd'
@@ -115,7 +115,7 @@ args.model_init = 'he_fout'
 args.validation_frequency = 1
 args.print_frequency = 10
 
-args.n_worker = 8
+args.n_worker = 5
 args.resize_scale = 0.08
 args.distort_color = 'tf'
 # args.image_size = '128,160,192,224'
@@ -309,17 +309,17 @@ if __name__ == '__main__':
     from compofacvpr.procedures.progressive_shrinking import validate, train
 
     validate_depth_list = []
-    # for i in range(2, 8+1, 4):
-    #     for j in range(2, 5+1, 3):
-    #         validate_depth_list.append([j, j, i, j])
-    for i, j in zip(range(2, 8+1, 6), range(2, 5+1, 3)):
-        validate_depth_list.append([j, j, i, j])
+    for i in range(2, 8+1, 4):
+        for j in range(2, 5+1, 3):
+            validate_depth_list.append([j, j, i, j])
+    # for i, j in zip(range(2, 8+1, 6), range(2, 5+1, 3)):
+    #     validate_depth_list.append([j, j, i, j])
 
     validate_func_dict = {'image_size_list': {224},
                           'width_mult_list': sorted({0, len(args.width_mult_list) - 1}),
                           'ks_list': None if args.fixed_kernel else sorted({min(args.ks_list), max(args.ks_list)}),
-                          # 'expand_ratio_list': [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7],
-                          'expand_ratio_list': [1.0, 0.85, 0.7],
+                          'expand_ratio_list': [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7],
+                          # 'expand_ratio_list': [1.0, 0.85, 0.7],
                           'depth_list': validate_depth_list}
 
     # validate_func_dict = {'image_size_list': {224},

@@ -91,6 +91,8 @@ class OFAResNet48(MyNetwork):
             in_channel_list=3, out_channel_list=input_channel, kernel_size=7,
             stride=2, act_func='relu',
         )
+        self.stem_max_pool_layer = PoolingLayer(in_channels=input_channel, out_channels=input_channel,
+                                                kernel_size=3, stride=2, pool_type='max')
 
         # inverted residual blocks
         self.block_group_info = []
@@ -135,6 +137,7 @@ class OFAResNet48(MyNetwork):
     def forward(self, x):
         # first block
         x = self.stem_block(x)
+        x = self.stem_max_pool_layer(x)
 
         # blocks
         for stage_id, block_idx in enumerate(self.block_group_info):
@@ -154,6 +157,7 @@ class OFAResNet48(MyNetwork):
     @property
     def module_str(self):
         _str = self.stem_block.module_str + '\n'
+        _str += self.stem_max_pool_layer.module_str + '\n'
 
         for stage_id, block_idx in enumerate(self.block_group_info):
             depth = self.runtime_depth[stage_id]

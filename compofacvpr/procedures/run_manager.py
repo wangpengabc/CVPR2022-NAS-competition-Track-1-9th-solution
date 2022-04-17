@@ -451,7 +451,7 @@ class RunManager:
             with tqdm(total=len(data_loader),
                       desc='Validate Epoch #{} {}'.format(epoch + 1, run_str), disable=no_logs) as t:
                 for i, (images, labels) in enumerate(data_loader):
-                    if i >5:
+                    if i >10:
                         break
 
                     images, labels = images.to(self.device), labels.to(self.device)
@@ -601,7 +601,7 @@ class RunManager:
             }, is_best=is_best)
 
     def reset_running_statistics(self, net=None):
-        from ofa.elastic_nn.utils import set_running_statistics
+        from ..models.dynamic_nn_utils import set_running_statistics
         if net is None:
             net = self.network
         sub_train_loader = self.run_config.random_sub_train_loader(2000, 100)

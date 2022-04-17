@@ -3,5 +3,6 @@ runs/
 runs1/
 .tmp/
 reference/
-result/
+# result/
+exp/
 compofaV1/

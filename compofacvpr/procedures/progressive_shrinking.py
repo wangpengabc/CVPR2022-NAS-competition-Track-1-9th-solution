@@ -21,6 +21,7 @@ from ..utils.evaluation_utils import accuracy
 from ..log_utils.meter import AverageMeter
 from ..utils import DistributedMetric, list_mean, cross_entropy_loss_with_soft_target, \
     subset_mean, int2list
+from ..utils.cvpr_nas_track_utils import convert_subnet_settings_to_arch_code
 from ..datasets.base_provider import MyRandomResizedCrop
 from ..procedures.distributed_run_manager import DistributedRunManager
 
@@ -43,6 +44,8 @@ def validate(run_manager, epoch=-1, is_test=True, image_size_list=None,
         expand_ratio_list = dynamic_net.expand_ratio_list
     if depth_list is None:
         depth_list = dynamic_net.depth_list
+    if hvd.rank() == 0:
+        print(expand_ratio_list)
 
     subnet_settings = []
     if dynamic_net.compound:
@@ -78,7 +81,7 @@ def validate(run_manager, epoch=-1, is_test=True, image_size_list=None,
     losses_of_subnets, top1_of_subnets, top5_of_subnets = [], [], []
 
     valid_log = ''
-    for setting, name in subnet_settings:
+    for setting, name in random.sample(subnet_settings, 5):
         run_manager.write_log('-' * 30 + ' Validate %s ' % name + '-' * 30, 'train', should_print=False)
         run_manager.run_config.data_provider.assign_active_img_size(setting.pop('image_size'))
         dynamic_net.set_active_subnet(**setting)
@@ -160,7 +163,7 @@ def train_one_epoch(run_manager, args, epoch, warmup_epochs=0, warmup_lr=0):
                 random.seed(subnet_seed)
                 subnet_settings = dynamic_net.sample_active_subnet()
                 subnet_str += '%d: ' % _ + ','.join(['%s_%s' % (
-                    key, '{}'.format(subset_mean(val, 0) if isinstance(val, list) and key != 'd' else val)
+                    key, '{}'.format(subset_mean(val, 0) if isinstance(val, list) and (key != 'd' and key != 'e') else val)
                 ) for key, val in subnet_settings.items()]) + ' || '
 
                 output = run_manager.net(images)
@@ -183,6 +186,20 @@ def train_one_epoch(run_manager, args, epoch, warmup_epochs=0, warmup_lr=0):
                 acc5_of_subnets.append(acc5[0])
 
                 loss.backward()
+
+                # save to json file
+                code_string = convert_subnet_settings_to_arch_code(subnet_settings)
+                with open(os.path.join("/home/sdc/wangpeng/NASHello/CVPR2022Track1/result", "CVPR_2022_NAS_Track1_test_gpu_{}.json".format(hvd.rank())),
+                          "r") as submit_json_file:
+                    # json.dump(arch_code_idx_dict, submit_json_file)
+                    arch_dict = json.load(submit_json_file)
+                    if code_string in list(arch_dict.keys()):
+                        arch_dict[code_string][1] = acc1[0]
+                if code_string in list(arch_dict.keys()):
+                    with open(os.path.join("/home/sdc/wangpeng/NASHello/CVPR2022Track1/result", "CVPR_2022_NAS_Track1_test_gpu_{}.json".format(hvd.rank())),
+                              "w") as submit_json_file:
+                        json.dump(arch_dict, submit_json_file)
+
             run_manager.optimizer.step()
 
             losses.update(list_mean(loss_of_subnets), images.size(0))
