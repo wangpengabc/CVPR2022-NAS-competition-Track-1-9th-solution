@@ -16,6 +16,6 @@ elif [ "$mode" = "single-gpu" ]
 then
   for ((j=0;j<=4;j++))
   do
-  CUDA_VISIBLE_DEVICES=1 python get_acc_for_cvpr_subnets.py --arch_idx_gpu_split $j --gpu_num single &
+  CUDA_VISIBLE_DEVICES=0 python get_acc_for_cvpr_subnets.py --arch_idx_gpu_split $j --gpu_num single &
   done
 fi
