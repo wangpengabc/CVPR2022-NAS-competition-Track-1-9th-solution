@@ -38,7 +38,7 @@ def read(fname="README.md"):
 
 # What packages are required for this module to be executed?
 # REQUIRED = ["numpy>=1.16.5,<=1.19.5", "pyyaml>=5.0.0", "fvcore"]
-REQUIRED = ["torch", "torchvision"]
+REQUIRED = ["torch", "torchvision", "paddlepaddle"]
 
 packages = find_packages(
     exclude=("figures", "NAS", "ofa")

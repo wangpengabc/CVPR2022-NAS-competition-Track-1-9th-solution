@@ -49,8 +49,8 @@ elif args.gpu_num == "single":
     # args.arch_idx_stop = 6500 * (split_idx + 1)
     # if args.arch_idx_stop > 45000:
     #     args.arch_idx_stop = 45000
-    args.arch_idx_start = 1300 * split_idx + 6500*3
-    args.arch_idx_stop = 1300 * (split_idx + 1) + 6500*3
+    args.arch_idx_start = 1300 * split_idx + 6500*6
+    args.arch_idx_stop = 1300 * (split_idx + 1) + 6500*6
     if args.arch_idx_stop > 45000:
         args.arch_idx_stop = 45000
 
@@ -137,7 +137,7 @@ def validate(subnet, verbose=True):
 
 
 if __name__ == '__main__':
-    submit_step = None # True  None
+    submit_step = True # True  None
     if submit_step is None:
         if args.distributed is True:
             os.makedirs(args.path, exist_ok=True)
@@ -244,7 +244,7 @@ if __name__ == '__main__':
                         #         json.dump(arch_dict, submit_json_file)
                         # elif args.gpu_num == "multiple":
                         if arch_idx % 10 == 0 or arch_idx == (args.arch_idx_stop-1):
-                            with open(os.path.join("result", "CVPR_2022_NAS_Track1_test_submit_3-{}.json".format(split_idx)),
+                            with open(os.path.join("result", "CVPR_2022_NAS_Track1_test_submit_6-{}.json".format(split_idx)),
                                       "w") as submit_json_file:
                                 json.dump(arch_dict, submit_json_file)
             print("-"*5, "CVPR_2022_NAS_Track1_test_submit_{}.json".format(split_idx), "Finish", "-"*5)
@@ -253,7 +253,7 @@ if __name__ == '__main__':
             arch_dict = json.load(json_file)
             # print(config)
             # for arch in random.sample(arch_dict.keys(), 500):
-            for split_idx in range(0, 3):
+            for split_idx in range(0, 7):
                 with open(os.path.join("result", "CVPR_2022_NAS_Track1_test_submit_{}.json".format(split_idx))) as submit_json_file:
                     arch_dict_split = json.load(submit_json_file)
                 arch_idx_start = split_idx * 6500
@@ -264,7 +264,7 @@ if __name__ == '__main__':
                 for arch_idx, arch in enumerate(list(arch_dict_split.keys())[arch_idx_start:arch_idx_stop]):
                     arch_dict[arch]['acc'] = arch_dict_split[arch]['acc']
                     # if arch_dict[arch]['acc'] < 20:
-                        # arch_dict[arch]['acc'] = (np.random.randn(1) * 5 + 70)[0]
+                    #     arch_dict[arch]['acc'] = (np.random.randn(1) * 5 + 68)[0]
                     # elif arch_dict[arch]['acc'] > 80:
                     #     arch_dict[arch]['acc'] = arch_dict[arch]['acc'] - 20
                     print(arch_dict[arch])
@@ -275,7 +275,7 @@ if __name__ == '__main__':
 
 
 
-        # sub_split_idx = 2
+        # sub_split_idx = 6
         # with open(os.path.join("result", "CVPR_2022_NAS_Track1_test_submit_{}.json".format(sub_split_idx)), "r") as json_file:
         #     arch_dict = json.load(json_file)
         #     # print(config)
