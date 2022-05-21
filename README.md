@@ -1,7 +1,7 @@
 # CVPR NAS Track 2022
 There are two versions of implementation, which are based on PaddlePaddle and Pytorch,respectively.
 
-ps: This project is adopted from OFA.
+ps: This project is adapted from OFA.
 ## Table of content
 - [Project Structure](#I)
 - [Training Porcedure](#II)
