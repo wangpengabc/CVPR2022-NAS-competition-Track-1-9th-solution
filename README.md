@@ -1,18 +1,59 @@
-# AI-Studio-项目标题
-> 一个好的标题会让你的开源项目发挥更大的价值，想不出好的名字也不用担心，起名时就统一使用AIStudio-xxx做开头吧~
+# CVPR NAS Track 2022
+There are two versions of implementation, which are based on PaddlePaddle and Pytorch,respectively.
 
-## 项目描述
-> 此处可以简要描述项目的“发家史”，例如它是做什么的？它有什么特点？
+ps: This project is adopted from OFA.
+## Table of content
+- [Project Structure](#I)
+- [Training Porcedure](#II)
 
-## 项目结构
-> 一目了然的项目结构能帮助更多人了解，目录树以及设计思想都很重要~
+### <a id="I">Part I. Project Structure </a>
+> There are mainly two parts in this project, compofacvprsinglemachine and compofacvprpaddle.
+
+The compofacvprpaddle is used for building the project based on paddlepaddle.The compofacvprsinglemachine is used for supporting pytorch. 
+Moreover, the compofacvpr is an implementation which contains distributed training and inference 
+based on horovod and pytorch.
 ```
--|data
--|work
+-|compofacvpr
+-|compofacvprpaddle
+-|compofacvprsinglemachine
+-|result
+-|runs
+train_ofa_resnet.py
+train_ofa_resnet_single_machine.py
+train_ofa_resnet_single_machine_paddlepaddle.py
+get_acc_for_cvpr_subnets.py
+get_acc_split_test_cases.sh
 -README.MD
--xxx.ipynb
 ```
-## 使用方式
-> 相信你的Fans已经看到这里了，快告诉他们如何快速上手这个项目吧~  
-A：在AI Studio上[运行本项目](https://aistudio.baidu.com/aistudio/usercenter)  
-B：此处由项目作者进行撰写使用方式。
+### <a id="II">Part II. Training Porcedure </a>
+- Training
+
+Teacher model
+```python
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine.py --task teacher --phase 1 --fixed_kernel
+or
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine_paddlepaddle.py --task teacher --phase 1 --fixed_kernel 
+```
+depth - First, the model is training in phase 1, then it is trained in phase 2.
+```python
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine.py --task depth --phase 1 --fixed_kernel
+or 
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine_paddlepaddle.py --task depth --phase 1 --fixed_kernel
+```
+expand - First, the model is training in phase 1, then it is trained in phase 2.
+```python
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine.py --task expand --phase 1 --fixed_kernel
+or 
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python train_ofa_resnet_single_machine_paddlepaddle.py --task expand --phase 1 --fixed_kernel
+```
+
+- Evaluation
+To evaluate the subnets faster, we split the overall candidate subnets into 8 parts which
+are evaluated on different gpus in parallel, respectively. The evaluation results are stored 
+in the directory of result. After evaluating all the parts, we merge the results into one unified
+json file.
+```python
+./get_acc_split_test_cases.sh
+```
+And the "submit_step" in get_acc_split_test_cases.py should change to True or False depending on 
+the stage which may be merge or evaluating.

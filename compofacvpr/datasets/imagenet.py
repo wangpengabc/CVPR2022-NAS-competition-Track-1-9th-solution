@@ -16,7 +16,7 @@ from .base_provider import DataProvider, MyRandomResizedCrop, MyDistributedSampl
 
 class ImagenetDataProvider(DataProvider):
     # DEFAULT_PATH = None
-    DEFAULT_PATH = "/home/sdb/yufang2/experiment/data/ILSVRC2012"
+    DEFAULT_PATH = "/home/sdb/xx/experiment/data/ILSVRC2012"
 
     def __init__(self, save_path=DEFAULT_PATH, train_batch_size=256, test_batch_size=512, valid_size=None, n_worker=32,
                  resize_scale=0.08, distort_color=None, image_size=224,
