@@ -57,3 +57,8 @@ json file.
 ```
 And the "submit_step" in get_acc_split_test_cases.py should change to True or False depending on 
 the stage which may be merge or evaluating.
+
+
+The checkpoint download url: [checkpoint](https://drive.google.com/file/d/1aI6oT_daWlZLiJ4LlTXsoovHR6xTCO2Y/view?usp=sharing)
+
+The checkpoint should be placed in ./runs/default/depth2depth_width/phase2/checkpoint/
